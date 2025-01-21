@@ -14,4 +14,4 @@ def add_bot():
     return f"Bot with token {bot_token} added successfully!"
 
 if __name__ == '__main__':
-    app.run(port=53197, debug=True)
+    app.run(port=56497, debug=True)
