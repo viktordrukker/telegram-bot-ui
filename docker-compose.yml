@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "51313:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=telegram_bot_ui.py
+      - DATABASE_URL=postgresql://bot_admin:wewffikp@db:5432/telegram_bot_db
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=bot_admin
+      - POSTGRES_PASSWORD=wewffikp
+      - POSTGRES_DB=telegram_bot_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
