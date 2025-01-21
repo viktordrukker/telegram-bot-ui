@@ -11,10 +11,15 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Make port 53197 available to the world outside this container
-EXPOSE 53197
+EXPOSE 53986
 
 # Define environment variable
 ENV FLASK_APP=telegram_bot_ui.py
 
 # Run the application
-CMD ["flask", "run", "--host=0.0.0.0", "--port=53197"]
+# Add a health check to ensure the application is running
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:53986/ || exit 1
+
+# Run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=53986"]
