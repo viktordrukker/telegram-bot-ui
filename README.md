@@ -1,57 +1,108 @@
-# Telegram Bots Management UI
+# Telegram Bot Management Platform
 
-This is a simple web application built with Flask to manage Telegram bots. It provides a user interface where you can add and manage Telegram bot tokens.
+A unified platform for managing multiple Telegram bots and broadcasting advertisements across them.
 
 ## Features
-- Add a Telegram bot by entering its token.
-- Basic UI for managing bots.
+
+- Centralized bot management through UI/API
+- Single-instance bot control (start/stop/restart)
+- Advertisement broadcasting system
+- Comprehensive metrics and statistics dashboard
+- Raw database viewer for requests and moderation
+- Error handling and logging system
 
 ## Prerequisites
-- Python 3.12
-- Docker (optional, for containerized deployment)
 
-## Installation
+- Docker Desktop
+- Git
 
-### Without Docker
+## Quick Start
+
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/telegram-bot-ui.git
-   cd telegram-bot-ui
-   ```
+```bash
+git clone https://github.com/viktordrukker/telegram-bot-ui.git
+cd telegram-bot-ui
+```
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. Build and run with Docker Compose:
+```bash
+docker compose up --build
+```
 
-3. Run the application:
-   ```bash
-   python telegram_bot_ui.py
-   ```
+3. Access the application:
+- Web UI: http://localhost:50328
+- Task Monitor: http://localhost:5555
 
-### With Docker
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/telegram-bot-ui.git
-   cd telegram-bot-ui
-   ```
+## Project Structure
 
-2. Build the Docker image:
-   ```bash
-   docker build -t telegram-bot-ui .
-   ```
+```
+telegram-bot-ui/
+├── app/                    # Backend application
+│   ├── api/               # API endpoints
+│   ├── models/            # Database models
+│   ├── services/          # Business logic
+│   └── tasks/             # Background tasks
+├── frontend/              # React frontend
+│   ├── public/            # Static files
+│   └── src/               # React components
+├── migrations/            # Database migrations
+└── tests/                 # Test suites
+```
 
-3. Run the Docker container:
-   ```bash
-   docker run -p 53197:53197 telegram-bot-ui
-   ```
+## Development
 
-## Usage
-- Access the application at `http://localhost:53197`.
-- Use the form to add a Telegram bot by entering its token.
+### Backend Development
+```bash
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run migrations
+flask db upgrade
+
+# Start development server
+flask run
+```
+
+### Frontend Development
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+```
+
+## Testing
+
+```bash
+# Run backend tests
+pytest
+
+# Run frontend tests
+cd frontend && npm test
+```
+
+## Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+FLASK_ENV=development
+DATABASE_URL=postgresql://bot_admin:wewffikp@db:5432/telegram_bot_db
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+```
 
 ## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+
+This project is licensed under the MIT License - see the LICENSE file for details

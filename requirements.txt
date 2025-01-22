@@ -1,16 +1,31 @@
+# Core Framework
 flask==3.1.0
 flask-sqlalchemy==3.1.1
 flask-migrate==4.0.5
 flask-cors==4.0.0
+
+# Database
 psycopg2-binary==2.9.9
+
+# Authentication & Environment
 python-dotenv==1.0.0
 pyjwt==2.8.0
-pytest==7.4.4
-pytest-cov==4.1.0
+
+# Telegram Integration
 python-telegram-bot==20.7
-gunicorn==21.2.0
-supervisor==4.2.5
-requests==2.31.0
+
+# Task Queue & Caching
 celery==5.3.6
 redis==5.0.1
 flower==2.0.1
+
+# Server & Process Management
+gunicorn==21.2.0
+supervisor==4.2.5
+
+# HTTP Client
+requests==2.31.0
+
+# Testing (development only)
+pytest==7.4.4
+pytest-cov==4.1.0
