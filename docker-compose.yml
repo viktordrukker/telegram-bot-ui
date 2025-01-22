@@ -4,12 +4,13 @@ services:
   web:
     build: .
     ports:
-      - "50328:5000"
+      - "51328:5000"
     volumes:
-      - .:/app
+      - ./logs:/app/logs
     environment:
       - FLASK_ENV=development
       - FLASK_APP=wsgi.py
+      - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://bot_admin:wewffikp@db:5432/telegram_bot_db
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -39,7 +40,7 @@ services:
     build: .
     command: celery -A app.tasks.bot_tasks worker --loglevel=info
     volumes:
-      - .:/app
+      - ./logs:/app/logs
     environment:
       - DATABASE_URL=postgresql://bot_admin:wewffikp@db:5432/telegram_bot_db
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -52,7 +53,7 @@ services:
     build: .
     command: celery -A app.tasks.bot_tasks beat --loglevel=info
     volumes:
-      - .:/app
+      - ./logs:/app/logs
     environment:
       - DATABASE_URL=postgresql://bot_admin:wewffikp@db:5432/telegram_bot_db
       - CELERY_BROKER_URL=redis://redis:6379/0
