@@ -3,10 +3,9 @@ FROM node:18 AS frontend-build
 WORKDIR /frontend
 COPY frontend/package*.json ./
 RUN npm cache clean --force && \
-    npm install --no-audit --no-fund --loglevel=error && \
-    npm install @babel/plugin-proposal-private-property-in-object --save-dev --loglevel=error
+    npm install --no-audit --no-fund --legacy-peer-deps --loglevel=error
 COPY frontend/ ./
-RUN npm run build
+RUN GENERATE_SOURCEMAP=false npm run build
 
 # Python backend
 FROM python:3.12-slim
