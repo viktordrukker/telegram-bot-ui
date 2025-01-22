@@ -102,7 +102,7 @@ function BotManagement() {
           : bot
       ));
     } catch (err) {
-      setError(\`Failed to \${action} bot\`);
+      setError(`Failed to ${action} bot`);
     } finally {
       setActionInProgress(null);
     }
