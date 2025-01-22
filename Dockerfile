@@ -2,10 +2,8 @@
 FROM node:18 AS frontend-build
 WORKDIR /frontend
 COPY frontend/package*.json ./
-RUN npm cache clean --force && \ 
-
-npm install --no-audit --no-fund --legacy-peer-deps --loglevel=error
-
+RUN npm cache clean --force && \
+    npm install --no-audit --no-fund --legacy-peer-deps --loglevel=error
 COPY frontend/ ./
 RUN GENERATE_SOURCEMAP=false npm run build
 
