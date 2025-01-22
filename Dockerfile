@@ -25,8 +25,9 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy frontend build
-COPY --from=frontend-build /frontend/build /app/static
+# Copy frontend build and ensure proper permissions
+COPY --from=frontend-build /frontend/build /app/static/
+RUN chown -R root:root /app/static && chmod -R 755 /app/static
 
 # Copy backend code
 COPY . .

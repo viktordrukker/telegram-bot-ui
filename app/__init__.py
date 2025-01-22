@@ -10,13 +10,14 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 def create_app(config=None):
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='static', static_url_path='')
     
     # Default configuration
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev_key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://bot_admin:wewffikp@db:5432/telegram_bot_db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 24 * 3600  # 24 hours
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching for development
 
     if config:
         app.config.update(config)
