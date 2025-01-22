@@ -2,7 +2,7 @@
 FROM node:18 AS frontend-build
 WORKDIR /frontend
 COPY frontend/package*.json ./
-RUN npm install
+RUN npm install --no-audit --no-fund --loglevel=error
 COPY frontend/ ./
 RUN npm run build
 
