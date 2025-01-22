@@ -35,8 +35,12 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create necessary directories
-RUN mkdir -p /app/static /app/logs /etc/supervisor/conf.d
+# Create necessary directories and set permissions
+RUN mkdir -p /app/static /app/logs /etc/supervisor/conf.d /var/log && \
+    touch /var/log/flask.err.log /var/log/flask.out.log \
+          /var/log/bot_manager.err.log /var/log/bot_manager.out.log \
+          /var/log/supervisord.log && \
+    chmod -R 777 /var/log
 
 # Copy frontend build and set permissions
 COPY --from=frontend-build /frontend/build /app/static/
