@@ -2,7 +2,9 @@
 FROM node:18 AS frontend-build
 WORKDIR /frontend
 COPY frontend/package*.json ./
-RUN npm install --no-audit --no-fund --loglevel=error
+RUN npm cache clean --force && \
+    npm install --no-audit --no-fund --loglevel=error && \
+    npm install @babel/plugin-proposal-private-property-in-object --save-dev --loglevel=error
 COPY frontend/ ./
 RUN npm run build
 
