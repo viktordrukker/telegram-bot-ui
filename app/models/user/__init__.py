@@ -1,74 +1,18 @@
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
-import uuid
-import json
 from datetime import datetime, timedelta
+import uuid
 import secrets
+from . import (
+    UserApiKey,
+    UserActivity,
+    UserSettings
+)
 
-class UserApiKey(db.Model):
-    __tablename__ = 'user_api_keys'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    key_hash = db.Column(db.String(128), nullable=False)
-    name = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    last_used_at = db.Column(db.DateTime)
-    expires_at = db.Column(db.DateTime)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'created_at': self.created_at.isoformat(),
-            'last_used_at': self.last_used_at.isoformat() if self.last_used_at else None,
-            'expires_at': self.expires_at.isoformat() if self.expires_at else None
-        }
-
-class UserActivity(db.Model):
-    __tablename__ = 'user_activities'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    action = db.Column(db.String(50), nullable=False)
-    details = db.Column(db.JSON)
-    ip_address = db.Column(db.String(45))
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'action': self.action,
-            'details': self.details,
-            'ip_address': self.ip_address,
-            'timestamp': self.timestamp.isoformat()
-        }
-
-class UserSettings(db.Model):
-    __tablename__ = 'user_settings'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    notification_preferences = db.Column(db.JSON, default=lambda: {
-        'email': True,
-        'web': True,
-        'bot_status': True,
-        'broadcast_status': True,
-        'security_alerts': True
-    })
-    theme = db.Column(db.String(20), default='light')
-    timezone = db.Column(db.String(50), default='UTC')
-    language = db.Column(db.String(10), default='en')
-    dashboard_layout = db.Column(db.JSON)
-
-    def to_dict(self):
-        return {
-            'notification_preferences': self.notification_preferences,
-            'theme': self.theme,
-            'timezone': self.timezone,
-            'language': self.language,
-            'dashboard_layout': self.dashboard_layout
-        }
+# Moved to dedicated modules under models/user/
+# - api_key.py
+# - activity.py 
+# - settings.py
 
 class User(db.Model):
     __tablename__ = 'users'
