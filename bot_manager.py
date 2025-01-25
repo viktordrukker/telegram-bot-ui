@@ -10,17 +10,19 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def main():
+    """Entry point for bot management service"""
     try:
-        # Initialize Flask app
         app = create_app()
-        logger.info("Bot manager started successfully")
+        logger.info("Initialized bot manager application")
         
-        # Keep the script running
-        while True:
-            pass
-            
+        # Start background scheduler
+        from app.tasks import scheduler
+        scheduler.start()
+        
+        return app
+
     except Exception as e:
-        logger.error(f"Error in bot manager: {str(e)}")
+        logger.critical(f"Failed to initialize bot manager: {str(e)}", exc_info=True)
         raise
 
 if __name__ == "__main__":

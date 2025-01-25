@@ -6,7 +6,7 @@ def create_celery(app=None):
         'telegram_bot_ui',
         broker=os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0'),
         backend=os.getenv('CELERY_RESULT_BACKEND', 'redis://redis:6379/0'),
-        include=['app.tasks.bot_tasks']
+        include=['app.tasks.bot_tasks', 'app.tasks.ad_tasks']
     )
 
     class ContextTask(celery.Task):
