@@ -10,6 +10,74 @@ import mimetypes
 
 logger = logging.getLogger(__name__)
 
+from abc import ABC, abstractmethod
+from config import StorageConfig
+
+class StorageProvider(ABC):
+    @abstractmethod
+    def save_file(self, file, filename: str, mime_type: str) -> str: ...
+    
+    @abstractmethod
+    def delete_file(self, url: str) -> bool: ...
+
+class S3Storage(StorageProvider):
+    def __init__(self, config: StorageConfig):
+        self.client = boto3.client(
+            's3',
+            aws_access_key_id=config.access_key_id,
+            aws_secret_access_key=config.secret_access_key,
+            region_name=config.region
+        )
+        self.bucket_name = config.bucket_name
+
+    def save_file(self, file, filename: str, mime_type: str) -> str:
+        try:
+            self.client.upload_fileobj(
+                file,
+                self.bucket_name,
+                filename,
+                ExtraArgs={
+                    'ContentType': mime_type,
+                    'ACL': 'public-read'
+                }
+            )
+            return f"https://{self.bucket_name}.s3.amazonaws.com/{filename}"
+        except ClientError as e:
+            logger.error(f"S3 upload error: {str(e)}")
+            raise StorageException("Failed to upload file to S3") from e
+
+    def delete_file(self, url: str) -> bool:
+        try:
+            self.client.delete_object(
+                Bucket=self.bucket_name,
+                Key=url.split('/')[-1]
+            )
+            return True
+        except ClientError as e:
+            logger.error(f"S3 delete error: {str(e)}")
+            return False
+
+class LocalStorage(StorageProvider):
+    def __init__(self, upload_dir: str):
+        self.upload_dir = upload_dir
+        os.makedirs(upload_dir, exist_ok=True)
+
+    def save_file(self, file, filename: str, mime_type: str) -> str:
+        file_path = os.path.join(self.upload_dir, filename)
+        file.save(file_path)
+        return f"/uploads/{filename}"
+
+    def delete_file(self, url: str) -> bool:
+        if not url.startswith('/uploads/'):
+            return False
+        file_path = os.path.join(self.upload_dir, url.split('/')[-1])
+        try:
+            os.remove(file_path)
+            return True
+        except OSError as e:
+            logger.error(f"Local delete error: {str(e)}")
+            return False
+
 class MediaService:
     ALLOWED_EXTENSIONS = {
         'image': {'png', 'jpg', 'jpeg', 'gif'},
@@ -18,19 +86,8 @@ class MediaService:
         'audio': {'mp3', 'wav', 'ogg'}
     }
 
-    def __init__(self):
-        self.storage_type = os.getenv('STORAGE_TYPE', 'local')
-        if self.storage_type == 's3':
-            self.s3_client = boto3.client(
-                's3',
-                aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-                aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-                region_name=os.getenv('AWS_REGION')
-            )
-            self.bucket_name = os.getenv('S3_BUCKET_NAME')
-        else:
-            self.upload_folder = os.path.join(current_app.root_path, 'uploads')
-            os.makedirs(self.upload_folder, exist_ok=True)
+    def __init__(self, storage: StorageProvider):
+        self.storage = storage
 
     def allowed_file(self, filename: str) -> Tuple[bool, Optional[str]]:
         """Check if the file extension is allowed"""
@@ -42,6 +99,25 @@ class MediaService:
             if ext in extensions:
                 return True, media_type
         return False, None
+
+    def save_file(self, file, filename: str) -> Tuple[str, str, str]:
+        """Save file and return URL, media type, and MIME type"""
+        allowed, media_type = self.allowed_file(filename)
+        if not allowed:
+            raise ValueError('File type not allowed')
+
+        secure_name = secure_filename(filename)
+        unique_filename = f"{uuid.uuid4()}_{secure_name}"
+        mime_type = self.get_mime_type(filename)
+
+        url = self.storage.save_file(file, unique_filename, mime_type)
+        return url, media_type, mime_type
+
+    def delete_file(self, url: str) -> bool:
+        """Delete file from storage"""
+        return self.storage.delete_file(url)
+
+    # Keep existing get_mime_type and get_file_info methods
 
     def get_mime_type(self, filename: str) -> str:
         """Get MIME type for the file"""
